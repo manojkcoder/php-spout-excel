@@ -4,6 +4,8 @@ namespace Box\Spout\Common\Entity;
 
 use Box\Spout\Common\Entity\Style\Style;
 use Box\Spout\Common\Helper\CellTypeHelper;
+use Box\Spout\Common\Entity\Style\Color;
+use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 
 /**
  * Class Cell
@@ -65,12 +67,24 @@ class Cell
     protected $style;
 
     /**
+     * The cell style
+     * @var Style
+     */
+    protected $hyper_link;
+
+    /**
      * @param $value mixed
      * @param Style|null $style
      */
-    public function __construct($value, Style $style = null)
+    public function __construct($value, Style $style = null, $hyper_link = null)
     {
         $this->setValue($value);
+		if($hyper_link !==  null){
+			if($style == null){
+				$style = (new StyleBuilder())->setFontColor(Color::BLUE)->setFontUnderline()->build();
+			}
+		}
+		$this->setHyperLink($hyper_link);
         $this->setStyle($style);
     }
 
@@ -81,6 +95,22 @@ class Cell
     {
         $this->value = $value;
         $this->type = $this->detectType($value);
+    }
+
+    /**
+     * @param mixed|null $value
+     */
+    public function setHyperLink($value)
+    {
+        $this->hyper_link = $value;
+    }
+
+    /**
+     * @param mixed|null $value
+     */
+    public function getHyperLink()
+    {
+        return $this->hyper_link;
     }
 
     /**

@@ -10,9 +10,15 @@ class Worksheet
 {
     /** @var string Path to the XML file that will contain the sheet data */
     private $filePath;
+	
+    /** @var string Path to the XML file that will contain the sheet data */
+    private $relsFilePath;
 
     /** @var resource Pointer to the sheet data file (e.g. xl/worksheets/sheet1.xml) */
     private $filePointer;
+
+    /** @var resource Pointer to the sheet data file (e.g. xl/worksheets/_rels/sheet1.xml.rels) */
+    private $relsFilePointer;
 
     /** @var Sheet The "external" sheet */
     private $externalSheet;
@@ -29,9 +35,10 @@ class Worksheet
      * @param string $worksheetFilePath
      * @param Sheet $externalSheet
      */
-    public function __construct($worksheetFilePath, Sheet $externalSheet)
+    public function __construct($worksheetFilePath, Sheet $externalSheet, $relsFilePath = null)
     {
         $this->filePath = $worksheetFilePath;
+        $this->relsFilePath = $relsFilePath;
         $this->filePointer = null;
         $this->externalSheet = $externalSheet;
         $this->maxNumColumns = 0;
@@ -60,6 +67,30 @@ class Worksheet
     public function setFilePointer($filePointer)
     {
         $this->filePointer = $filePointer;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelsFilePath()
+    {
+        return $this->relsFilePath;
+    }
+
+    /**
+     * @return resource
+     */
+    public function getRelsFilePointer()
+    {
+        return $this->relsFilePointer;
+    }
+
+    /**
+     * @param resource $filePointer
+     */
+    public function setRelsFilePointer($filePointer)
+    {
+        $this->relsFilePointer = $filePointer;
     }
 
     /**

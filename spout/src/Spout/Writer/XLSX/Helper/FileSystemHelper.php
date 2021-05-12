@@ -53,6 +53,9 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
     /** @var string Path to the "worksheets" folder inside the "xl" folder */
     private $xlWorksheetsFolder;
 
+    /** @var string Path to the "rels" folder inside the "worksheets" folder */
+    private $xlWorksheetsRelsFolder;
+
     /**
      * @param string $baseFolderPath The path of the base folder where all the I/O can occur
      * @param ZipHelper $zipHelper Helper to perform tasks with Zip archive
@@ -87,6 +90,14 @@ class FileSystemHelper extends \Box\Spout\Common\Helper\FileSystemHelper impleme
     public function getXlWorksheetsFolder()
     {
         return $this->xlWorksheetsFolder;
+    }
+
+    /**
+     * @return string
+     */
+    public function getXlWorksheetsRelsFolder()
+    {
+        return $this->xlWorksheetsRelsFolder;
     }
 
     /**
@@ -226,6 +237,7 @@ EOD;
         $this->xlFolder = $this->createFolder($this->rootFolder, self::XL_FOLDER_NAME);
         $this->createXlRelsFolder();
         $this->createXlWorksheetsFolder();
+        $this->createXlWorksheetsRelsFolder();
 
         return $this;
     }
@@ -252,6 +264,19 @@ EOD;
     private function createXlWorksheetsFolder()
     {
         $this->xlWorksheetsFolder = $this->createFolder($this->xlFolder, self::WORKSHEETS_FOLDER_NAME);
+
+        return $this;
+    }
+
+    /**
+     * Creates the "worksheets" folder under the "xl" folder
+     *
+     * @throws \Box\Spout\Common\Exception\IOException If unable to create the folder
+     * @return FileSystemHelper
+     */
+    private function createXlWorksheetsRelsFolder()
+    {
+        $this->xlWorksheetsRelsFolder = $this->createFolder($this->xlWorksheetsFolder, self::RELS_FOLDER_NAME);
 
         return $this;
     }

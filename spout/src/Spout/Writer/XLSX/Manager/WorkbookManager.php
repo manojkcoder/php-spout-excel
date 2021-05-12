@@ -38,13 +38,24 @@ class WorkbookManager extends WorkbookManagerAbstract
 
     /**
      * @param Sheet $sheet
-     * @return string The file path where the data for the given sheet will be stored
+     * @return string The file path where the data for the given sheet will be storedxlWorksheetsFolder
      */
     public function getWorksheetFilePath(Sheet $sheet)
     {
         $worksheetFilesFolder = $this->fileSystemHelper->getXlWorksheetsFolder();
 
         return $worksheetFilesFolder . '/' . \strtolower($sheet->getName()) . '.xml';
+    }
+
+    /**
+     * @param Sheet $sheet
+     * @return string The file path where the data for the given sheet will be storedxlWorksheetsFolder
+     */
+    public function getWorksheetRelsFilePath(Sheet $sheet)
+    {
+        $worksheetRelsFolder = $this->fileSystemHelper->getXlWorksheetsRelsFolder();
+
+        return $worksheetRelsFolder . '/' . \strtolower($sheet->getName()) . '.xml.rels';
     }
 
     /**

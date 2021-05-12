@@ -129,9 +129,11 @@ abstract class WorkbookManagerAbstract implements WorkbookManagerInterface
         $sheet = $this->entityFactory->createSheet($newSheetIndex, $this->workbook->getInternalId(), $sheetManager);
 
         $worksheetFilePath = $this->getWorksheetFilePath($sheet);
-        $worksheet = $this->entityFactory->createWorksheet($worksheetFilePath, $sheet);
+        $worksheetRelsFilePath = $this->getWorksheetRelsFilePath($sheet);
+        $worksheet = $this->entityFactory->createWorksheet($worksheetFilePath, $sheet, $worksheetRelsFilePath);
 
         $this->worksheetManager->startSheet($worksheet);
+        $this->worksheetManager->startRels($worksheet);
 
         $worksheets[] = $worksheet;
         $this->workbook->setWorksheets($worksheets);

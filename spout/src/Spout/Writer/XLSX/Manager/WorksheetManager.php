@@ -38,6 +38,12 @@ class WorksheetManager implements WorksheetManagerInterface
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 EOD;
 
+
+    const SHEET_XML_RELS_FILE_HEADER = <<<'EOD'
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+EOD;
+
     /** @var bool Whether inline or shared strings should be used */
     protected $shouldUseInlineStrings;
 
@@ -61,6 +67,9 @@ EOD;
 
     /** @var InternalEntityFactory Factory to create entities */
     private $entityFactory;
+
+    /** @var InternalEntityFactory Factory to create entities */
+    private $hyperlinks;
 
     /**
      * WorksheetManager constructor.
@@ -92,6 +101,7 @@ EOD;
         $this->stringsEscaper = $stringsEscaper;
         $this->stringHelper = $stringHelper;
         $this->entityFactory = $entityFactory;
+        $this->hyperlinks = [];
     }
 
     /**
@@ -114,6 +124,19 @@ EOD;
 
         \fwrite($sheetFilePointer, self::SHEET_XML_FILE_HEADER);
         \fwrite($sheetFilePointer, '<sheetData>');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function startRels(Worksheet $worksheet)
+    {
+        $sheetRelsFilePointer = \fopen($worksheet->getRelsFilePath(), 'w');
+        $this->throwIfSheetFilePointerIsNotAvailable($sheetRelsFilePointer);
+
+        $worksheet->setRelsFilePointer($sheetRelsFilePointer);
+
+        \fwrite($sheetRelsFilePointer, self::SHEET_XML_RELS_FILE_HEADER);
     }
 
     /**
@@ -212,6 +235,10 @@ EOD;
         $cellXML = '<c r="' . $columnLetters . $rowIndexOneBased . '"';
         $cellXML .= ' s="' . $styleId . '"';
 
+        if ($cell->getHyperLink() !== null) {
+			$this->hyperlinks['rId'.(count($this->hyperlinks) + 1).'~~'.$cell->getHyperLink()] = '<hyperlink ref="' . $columnLetters . $rowIndexOneBased . '" r:id="rId'.(count($this->hyperlinks) + 1).'"/>';
+		}
+
         if ($cell->isString()) {
             $cellXML .= $this->getCellXMLFragmentForNonEmptyString($cell->getValue());
         } elseif ($cell->isBoolean()) {
@@ -265,13 +292,27 @@ EOD;
     public function close(Worksheet $worksheet)
     {
         $worksheetFilePointer = $worksheet->getFilePointer();
+        $worksheetRelsFilePointer = $worksheet->getRelsFilePointer();
 
         if (!\is_resource($worksheetFilePointer)) {
             return;
         }
 
         \fwrite($worksheetFilePointer, '</sheetData>');
+		if(count($this->hyperlinks)){
+			\fwrite($worksheetFilePointer, '<hyperlinks>'. implode('', array_values($this->hyperlinks)) .'</hyperlinks>');
+		}
         \fwrite($worksheetFilePointer, '</worksheet>');
         \fclose($worksheetFilePointer);
+
+		if(count($this->hyperlinks)){
+			$hyperlinks = array_keys($this->hyperlinks);
+			foreach($hyperlinks as $hyperlink){
+				$parts = explode('~~', $hyperlink);
+				\fwrite($worksheetRelsFilePointer, '<Relationship Id="'.$parts[0].'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="'.$parts[1].'" TargetMode="External"/>');
+			}
+		}
+        \fwrite($worksheetRelsFilePointer, '</Relationships>');
+        \fclose($worksheetRelsFilePointer);
     }
 }

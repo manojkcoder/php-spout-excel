@@ -110,8 +110,8 @@ class WriterEntityFactory
      * @param Style|null $cellStyle
      * @return Cell
      */
-    public static function createCell($cellValue, Style $cellStyle = null)
+    public static function createCell($cellValue, Style $cellStyle = null, $hyper_link = null)
     {
-        return new Cell($cellValue, $cellStyle);
+        return new Cell($cellValue, $cellStyle, $hyper_link);
     }
 }

@@ -26,9 +26,9 @@ class InternalEntityFactory
      * @param Sheet $externalSheet
      * @return Worksheet
      */
-    public function createWorksheet($worksheetFilePath, Sheet $externalSheet)
+    public function createWorksheet($worksheetFilePath, Sheet $externalSheet, $worksheetRelsFilePath = null)
     {
-        return new Worksheet($worksheetFilePath, $externalSheet);
+        return new Worksheet($worksheetFilePath, $externalSheet, $worksheetRelsFilePath);
     }
 
     /**
